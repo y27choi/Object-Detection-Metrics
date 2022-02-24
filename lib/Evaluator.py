@@ -40,8 +40,10 @@ class Evaluator:
             A list of dictionaries. Each dictionary contains information and metrics of each class.
             The keys of each dictionary are:
             dict['class']: class representing the current dictionary;
+            dict['confidence score']: confidence score;
             dict['precision']: array with the precision values;
             dict['recall']: array with the recall values;
+            dict['f1']: array with the f1 scores;
             dict['AP']: average precision;
             dict['interpolated precision']: interpolated precision values;
             dict['interpolated recall']: interpolated recall values;
@@ -92,6 +94,7 @@ class Evaluator:
 
             # sort detections by decreasing confidence
             dects = sorted(dects, key=lambda conf: conf[2], reverse=True)
+            confs = [d[2] for d in dects]
             TP = np.zeros(len(dects))
             FP = np.zeros(len(dects))
             # create dictionary with amount of gts for each image
@@ -128,6 +131,7 @@ class Evaluator:
             acc_TP = np.cumsum(TP)
             rec = acc_TP / npos
             prec = np.divide(acc_TP, (acc_FP + acc_TP))
+            f1 = np.divide(2 * prec * rec, (prec + rec))
             # Depending on the method, call the right implementation
             if method == MethodAveragePrecision.EveryPointInterpolation:
                 [ap, mpre, mrec, ii] = Evaluator.CalculateAveragePrecision(rec, prec)
@@ -136,8 +140,10 @@ class Evaluator:
             # add class result in the dictionary to be returned
             r = {
                 'class': c,
+                'confidence score': confs,
                 'precision': prec,
                 'recall': rec,
+                'f1': f1,
                 'AP': ap,
                 'interpolated precision': mpre,
                 'interpolated recall': mrec,
