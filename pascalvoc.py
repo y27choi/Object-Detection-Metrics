@@ -392,9 +392,11 @@ for metricsPerClass in detections:
 
     # Get metric values per each class
     cl = metricsPerClass['class']
+    cs = metricsPerClass['confidence score']
     ap = metricsPerClass['AP']
     precision = metricsPerClass['precision']
     recall = metricsPerClass['recall']
+    f1 = metricsPerClass['f1']
     totalPositives = metricsPerClass['total positives']
     total_TP = metricsPerClass['total TP']
     total_FP = metricsPerClass['total FP']
@@ -402,15 +404,19 @@ for metricsPerClass in detections:
     if totalPositives > 0:
         validClasses = validClasses + 1
         acc_AP = acc_AP + ap
-        prec = ['%.2f' % p for p in precision]
-        rec = ['%.2f' % r for r in recall]
+        conf = ['%.8f' % c for c in cs]
+        prec = ['%.4f' % p for p in precision]
+        rec = ['%.4f' % r for r in recall]
+        f1s = ['%.4f' % f for f in f1]
         ap_str = "{0:.2f}%".format(ap * 100)
         # ap_str = "{0:.4f}%".format(ap * 100)
         print('AP: %s (%s)' % (ap_str, cl))
         f.write('\n\nClass: %s' % cl)
         f.write('\nAP: %s' % ap_str)
+        f.write('\nConfidence Score: %s' % conf)
         f.write('\nPrecision: %s' % prec)
         f.write('\nRecall: %s' % rec)
+        f.write('\nF1 Score: %s' % f1s)
 
 mAP = acc_AP / validClasses
 mAP_str = "{0:.2f}%".format(mAP * 100)
